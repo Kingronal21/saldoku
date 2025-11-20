@@ -6,9 +6,6 @@ import threading
 import pandas as pd
 import os
 
-# --------------------------
-# FLASK KEEP ALIVE SERVER
-# --------------------------
 from flask import Flask
 from threading import Thread
 
@@ -25,10 +22,6 @@ def keep_alive():
     t = Thread(target=run_server)
     t.start()
 
-
-# --------------------------
-# DATABASE
-# --------------------------
 DB_FILE = "db.json"
 
 try:
@@ -41,10 +34,6 @@ def save_db():
     with open(DB_FILE, "w") as f:
         json.dump(db, f, indent=2)
 
-
-# --------------------------
-# KATEGORI
-# --------------------------
 CATEGORY_BUTTONS = [
     [InlineKeyboardButton("Belanja", callback_data="belanja")],
     [InlineKeyboardButton("Makanan", callback_data="makanan")],
@@ -52,9 +41,6 @@ CATEGORY_BUTTONS = [
     [InlineKeyboardButton("Lainnya", callback_data="lainnya")],
 ]
 
-# --------------------------
-# COMMAND: /start
-# --------------------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Halo! Bot UMKM lengkap siap pakai.\n\n"
@@ -65,10 +51,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-
-# --------------------------
-# COMMAND: /add
-# --------------------------
 async def add(update: Update, context: ContextTypes.DEFAULT_TYPE):
     args = context.args
     if len(args) < 2:
@@ -94,9 +76,6 @@ async def add(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Pilih kategori:", reply_markup=InlineKeyboardMarkup(CATEGORY_BUTTONS)
     )
 
-# --------------------------
-# CALLBACK BUTTON
-# --------------------------
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -118,9 +97,6 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"✅ Catatan ditambahkan: {t['type']} {t['amount']} ({t['category']})"
     )
 
-# --------------------------
-# COMMAND: /laporan
-# --------------------------
 async def laporan(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = str(update.message.from_user.id)
 
@@ -152,9 +128,6 @@ async def laporan(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Saldo: {saldo}"
     )
 
-# --------------------------
-# COMMAND: /export
-# --------------------------
 async def export(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = str(update.message.from_user.id)
 
@@ -168,9 +141,7 @@ async def export(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_document(open(filename, "rb"))
 
-# --------------------------
-# REMINDER HARIAN
-# --------------------------
+
 def daily_reminder(app):
     async def reminder():
         for user_id in db:
@@ -183,20 +154,12 @@ def daily_reminder(app):
         86400, lambda: [app.create_task(reminder()), daily_reminder(app)]
     ).start()
 
-
-# --------------------------
-# BOT TOKEN
-# --------------------------
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 if not BOT_TOKEN:
     print("❗ ERROR: Set TELEGRAM_BOT_TOKEN di Replit Secrets!")
     exit()
 
-
-# --------------------------
-# BOT INIT
-# --------------------------
 app = ApplicationBuilder().token(BOT_TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
@@ -210,6 +173,7 @@ keep_alive()
 
 print("🔥 Bot UMKM aktif 24 jam...")
 app.run_polling()
+
 
 
 
